@@ -1,3 +1,10 @@
+## 中文支持
+* 训练数据在`data/tasks_1-20_v1-2/zh`
+* 训练
+```
+python -m demo.qa -d data/tasks_1-20_v1-2/zh -m trained_model/zh_test.pklz -train
+```
+
 ## End-To-End Memory Networks for Question Answering
 This is an implementation of MemN2N model in Python for the [bAbI question-answering tasks](http://fb.ai/babi) 
 as shown in the Section 4 of the paper "[End-To-End Memory Networks](http://arxiv.org/abs/1503.08895)". It is based on 
