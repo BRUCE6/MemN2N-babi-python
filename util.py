@@ -1,9 +1,11 @@
+#coding:utf-8
 from __future__ import division
 
 import sys
 import time
 
 import numpy as np
+import jieba
 
 from memn2n.memory import MemoryL, MemoryBoW
 from memn2n.nn import AddTable, CrossEntropyLoss, Duplicate, ElemMult, LinearNB
@@ -48,7 +50,16 @@ def parse_babi_task(data_files, dictionary, include_question):
         with open(fp) as f:
             for line_idx, line in enumerate(f):
                 line = line.rstrip().lower()
-                words = line.split()
+                # words = line.split()
+                # for chinese
+                print(line)
+                # In case there are blank lines
+                words = list(jieba.cut(line))
+                if words == []:
+                    continue
+                # remove ' ' in words
+                words = [w for w in words if w != ' ']
+                # print(words)
 
                 # Story begins
                 if words[0] == '1':
@@ -57,7 +68,9 @@ def parse_babi_task(data_files, dictionary, include_question):
                     mapping = []
 
                 # FIXME: This condition makes the code more fragile!
-                if '?' not in line:
+                # especially for chinese
+                # if '?' not in line:
+                if '？' not in line:
                     is_question = False
                     sentence_idx += 1
                 else:
@@ -74,24 +87,31 @@ def parse_babi_task(data_files, dictionary, include_question):
                 for k in range(1, len(words)):
                     w = words[k]
 
-                    if w.endswith('.') or w.endswith('?'):
-                        w = w[:-1]
-
-                    if w not in dictionary:
-                        dictionary[w] = len(dictionary)
+                    # if w.endswith('.') or w.endswith('?'):
+                    # for chinese
+                    # if w.endswith('。') or w.endswith('？'):
+                    #     w = w[:-1]
+                    # TODO: '。' or '？' is isolated in jieba
+                    # utf-8 is type byte str
+                    if w.encode('utf-8') not in ['。', '？']:
+                        if w not in dictionary:
+                            dictionary[w] = len(dictionary)
 
                     if max_words < k:
                         max_words = k
 
                     if not is_question:
-                        story[k - 1, sentence_idx, story_idx] = dictionary[w]
-                    else:
-                        qstory[k - 1, question_idx] = dictionary[w]
-                        if include_question:
+                        if w.encode('utf-8') not in ['。', '？']:
                             story[k - 1, sentence_idx, story_idx] = dictionary[w]
+                    else:
+                        if w.encode('utf-8') not in ['。', '？']:
+                            qstory[k - 1, question_idx] = dictionary[w]
+                            if include_question:
+                                story[k - 1, sentence_idx, story_idx] = dictionary[w]
 
                         # NOTE: Punctuation is already removed from w
-                        if words[k].endswith('?'):
+                        # for chinese
+                        if words[k].encode('utf-8').endswith('？'):
                             answer = words[k + 1]
                             if answer not in dictionary:
                                 dictionary[answer] = len(dictionary)
@@ -100,6 +120,7 @@ def parse_babi_task(data_files, dictionary, include_question):
 
                             # Indices of supporting sentences
                             for h in range(k + 2, len(words)):
+                                print(words[h])
                                 questions[1 + h - k, question_idx] = mapping[int(words[h]) - 1]
 
                             questions[-1, question_idx] = line_idx

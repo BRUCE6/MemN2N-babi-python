@@ -36,6 +36,8 @@ def train(train_story, train_questions, train_qstory, memory, model, loss, gener
         total_err  = 0.
         total_cost = 0.
         total_num  = 0
+        # print train_len
+        # print(train_len, batch_size, int(math.floor(train_len / batch_size)))
         for _ in Progress(range(int(math.floor(train_len / batch_size)))):
             # Question batch
             batch = train_range[np.random.randint(train_len, size=batch_size)]

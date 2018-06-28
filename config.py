@@ -17,7 +17,8 @@ class BabiConfig(object):
 
         self.train_range    = np.array(range(nb_train_questions))
         self.val_range      = np.array(range(nb_train_questions, nb_questions))
-        self.enable_time    = True   # add time embeddings
+        # TODO: what is enable_time
+        self.enable_time    = False   # add time embeddings
         self.use_bow        = False  # use Bag-of-Words instead of Position-Encoding
         self.linear_start   = True
         self.share_type     = 1      # 1: adjacent, 2: layer-wise weight tying
@@ -61,11 +62,12 @@ class BabiConfigJoint(object):
 
         # TODO: Inherit from BabiConfig
         self.dictionary       = dictionary
-        self.batch_size       = 32
+        self.batch_size       = 1
+        # self.batch_size       = 32
         self.nhops            = 3
-        self.nepochs          = 60
+        self.nepochs          = 200
 
-        self.lrate_decay_step = 15   # reduce learning rate by half every 25 epochs  # XXX:
+        self.lrate_decay_step = 20   # reduce learning rate by half every 25 epochs  # XXX:
 
         # Use 10% of training data for validation  # XXX
         nb_questions        = train_questions.shape[1]
@@ -76,7 +78,8 @@ class BabiConfigJoint(object):
         self.train_range = rp[:nb_train_questions]
         self.val_range   = rp[nb_train_questions:]
 
-        self.enable_time    = True   # add time embeddings
+        # TODO: what is enable_time
+        self.enable_time    = False   # add time embeddings
         self.use_bow        = False  # use Bag-of-Words instead of Position-Encoding
         self.linear_start   = True
         self.share_type     = 1      # 1: adjacent, 2: layer-wise weight tying
